@@ -89,7 +89,7 @@ function doPost(e) {
     const api = {
       getAll: getAll_, saveTransaction: saveTransaction_, deleteTransaction: deleteTransaction_,
       setBudget: setBudget_, addGoal: addGoal_, goalTx: goalTx_, addDebt: addDebt_, debtTx: debtTx_,
-      addInv: addInv_, invTx: invTx_, deleteItem: deleteItem_
+      addInv: addInv_, invTx: invTx_, deleteItem: deleteItem_, editItem: editItem_
     };
     if (!api[fn]) throw new Error('Perintah tidak dikenal.');
     const args = Array.isArray(req.args) ? req.args : [];
@@ -260,6 +260,46 @@ function deleteItem_(kind, id) {
       if (String(log.rows[i][cP]).trim() === id) log.sh.deleteRow(i + 2);
     }
     t.sh.deleteRow(row);
+  });
+}
+
+/** Ubah data dasar hutang / tabungan / investasi. o berisi kolom yang mau diubah. */
+function editItem_(kind, id, o) {
+  o = o || {}; id = String(id || '').trim();
+  const name = String(o.name || '').trim();
+  if (!name) throw new Error('Namanya belum diisi.');
+  return withLock_(function (ss, tz) {
+    const sheet = { debt: SHEET.DEBT, goal: SHEET.GOAL, inv: SHEET.INV }[kind];
+    if (!sheet) throw new Error('Jenis data tidak dikenal.');
+    const t = table_(ss, sheet), cId = col_(t, 'ID', true);
+    let row = -1;
+    t.rows.forEach(function (r, i) { if (String(r[cId]).trim() === id) row = i + 2; });
+    if (row < 0) throw new Error('Data tidak ditemukan. Mungkin sudah dihapus.');
+    const set = function (h, v, fmt) { const c = col_(t, h, false); if (c === undefined) return; const cell = t.sh.getRange(row, c + 1).setValue(v); if (fmt) cell.setNumberFormat(fmt); };
+    if (kind === 'goal') {
+      const target = toNum_(o.target);
+      if (!(target > 0)) throw new Error('Target dana harus lebih dari 0.');
+      set('Nama Target', name);
+      set('Target Dana', target, MONEY_FORMAT);
+      set('Tenggat', /^\d{4}-\d{2}$/.test(o.deadline || '') ? Utilities.parseDate(o.deadline + '-01', tz, 'yyyy-MM-dd') : '', 'mmm yyyy');
+      refreshGoals_(ss, tz);
+    } else if (kind === 'debt') {
+      set('Nama', name);
+      set('Jenis', o.kind || 'Pribadi');
+      const total = toNum_(o.total);
+      if (o.total !== undefined && o.total !== '') {
+        if (!(total > 0)) throw new Error('Total hutang harus lebih dari 0.');
+        const d = readDebts_(ss).filter(function (x) { return x.id === id; })[0];
+        if (total < d.paid) throw new Error('Total tidak boleh lebih kecil dari yang sudah dibayar (' + rp_(d.paid) + ').');
+        const delta = total - d.total;
+        if (delta !== 0) appendByHeader_(table_(ss, SHEET.DEBT_LOG), { 'ID': newId_('HR'), 'Hutang ID': id, 'Tanggal': new Date(), 'Jenis': 'Tambah', 'Nominal': delta, 'Catatan': 'Koreksi total hutang', 'Dicatat Pada': new Date() });
+      }
+      refreshDebts_(ss);
+    } else {
+      set('Nama', name);
+      set('Platform', o.platform || '');
+      set('Jenis', o.kind || 'Lainnya');
+    }
   });
 }
 

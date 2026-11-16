@@ -1,6 +1,6 @@
 // Cuan! service worker: simpan tampilan aplikasi supaya cepat dibuka.
 // Data keuangan tidak disimpan di sini; selalu diambil dari Google Sheets.
-const CACHE = 'cuan-shell-v3';
+const CACHE = 'cuan-shell-v4';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png', './icons/favicon-32.png'];
 
 self.addEventListener('install', (e) => {
