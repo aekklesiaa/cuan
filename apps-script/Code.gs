@@ -81,7 +81,7 @@ function doPost(e) {
   catch (err) { return json_({ ok: false, error: 'Permintaan tidak valid.' }); }
   try {
     const fn = String(req.fn || '');
-    if (fn === 'pinStatus') return json_({ ok: true, data: { hasPin: !!prop_('PIN_HASH') } });
+    if (fn === 'pinStatus') return json_({ ok: true, data: { hasPin: !!prop_('PIN_HASH'), len: Number(prop_('PIN_LEN') || 0) } });
     if (fn === 'createPin') return json_({ ok: true, data: createPin_(req.pin) });
     if (fn === 'login') return json_({ ok: true, data: login_(req.pin) });
     checkToken_(req.token);
@@ -125,7 +125,7 @@ function createPin_(pin) {
   try {
     if (prop_('PIN_HASH')) throw new Error('PIN sudah pernah dibuat. Masukkan PIN-mu.');
     const salt = Utilities.getUuid();
-    PropertiesService.getScriptProperties().setProperties({ PIN_SALT: salt, PIN_HASH: hash_(pin, salt), TOKENS: '{}' });
+    PropertiesService.getScriptProperties().setProperties({ PIN_SALT: salt, PIN_HASH: hash_(pin, salt), PIN_LEN: String(pin.length), TOKENS: '{}' });
     return { token: issueToken_() };
   } finally { lock.releaseLock(); }
 }
@@ -142,6 +142,7 @@ function login_(pin) {
     throw authErr_('PIN salah. Sisa ' + (PIN_MAX_FAILS - fails) + ' kali coba.', 'BAD_PIN');
   }
   cache.remove('PIN_FAILS');
+  if (!prop_('PIN_LEN')) PropertiesService.getScriptProperties().setProperty('PIN_LEN', String(pin.length));
   return { token: issueToken_() };
 }
 
@@ -181,7 +182,7 @@ function authErr_(msg, code) { const e = new Error(msg); e.code = code; return e
  */
 function resetPin() {
   const props = PropertiesService.getScriptProperties();
-  ['PIN_HASH', 'PIN_SALT', 'TOKENS'].forEach(function (k) { props.deleteProperty(k); });
+  ['PIN_HASH', 'PIN_SALT', 'PIN_LEN', 'TOKENS'].forEach(function (k) { props.deleteProperty(k); });
   CacheService.getScriptCache().removeAll(['PIN_FAILS', 'PIN_LOCKED']);
 }
 

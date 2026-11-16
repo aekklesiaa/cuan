@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#2747D6">
 <title>Cuan!</title>
 <meta name="description" content="Catatan keuangan konyol tapi rapi bareng Si Cuan">
@@ -24,7 +24,9 @@
   --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--cream);color:var(--ink);font-family:'Nunito',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+html,body{margin:0;background:var(--cream);color:var(--ink);font-family:'Nunito',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden;overscroll-behavior:none;touch-action:pan-y;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-text-size-adjust:100%}
+html,body{max-width:100vw}
+input,textarea,select{-webkit-user-select:text;user-select:text}
 body{min-height:100vh;min-height:100dvh}
 button,input,select{font-family:inherit;color:inherit}
 input:focus-visible,select:focus-visible,button:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
@@ -39,7 +41,7 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:3px solid 
 .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .grow{flex:1;min-width:0}
 .ellipsis{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hscroll{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}.hscroll::-webkit-scrollbar{display:none}
+.hscroll{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;touch-action:pan-x pan-y;overscroll-behavior-x:contain}.hscroll::-webkit-scrollbar{display:none}
 .fade{animation:fade .3s ease}
 @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .sheet-anim{animation:up .34s cubic-bezier(.2,.9,.25,1.15)}
@@ -102,7 +104,7 @@ select.field{background-image:linear-gradient(45deg,transparent 50%,var(--ink) 5
 .nav.on{color:var(--yellow)}
 .fab{width:64px;height:64px;margin:-30px auto 0;border:2.5px solid var(--ink);border-radius:50%;background:var(--yellow);color:var(--ink);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 0 var(--ink);cursor:pointer}
 .backdrop{position:fixed;inset:0;z-index:35;border:0;background:rgba(27,37,89,.45);cursor:default;width:100%}
-.sheet{position:fixed;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;z-index:40;background:var(--cream);border:2px solid var(--ink);border-bottom:0;border-radius:30px 30px 0 0;padding:10px 20px calc(24px + var(--safe-b));max-height:92vh;max-height:92dvh;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+.sheet{position:fixed;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;z-index:40;background:var(--cream);border:2px solid var(--ink);border-bottom:0;border-radius:30px 30px 0 0;padding:10px 20px calc(24px + var(--safe-b));max-height:92vh;max-height:92dvh;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;display:flex;flex-direction:column;gap:14px}
 .handle{width:44px;height:6px;border-radius:999px;background:var(--ink);align-self:center;flex:none}
 .xbtn{width:44px;height:44px;flex:none;border:2px solid var(--ink);border-radius:14px;background:#fff;color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 0 var(--ink)}
 .confirm{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(27,37,89,.55)}
@@ -113,6 +115,15 @@ select.field{background-image:linear-gradient(45deg,transparent 50%,var(--ink) 5
 @keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
 .skeleton{background:linear-gradient(90deg,#EEF1F8 25%,#F7F8FC 50%,#EEF1F8 75%);background-size:200% 100%;animation:sk 1.2s infinite;border-radius:18px}
 @keyframes sk{to{background-position:-200% 0}}
+.calc-display{display:flex;align-items:center;gap:8px;padding:6px 16px;min-height:62px;border-radius:18px;background:#fff;border:2px solid var(--ink);box-shadow:0 3px 0 var(--ink)}
+.calc-expr{flex:1;min-width:0;text-align:right;font-size:34px;font-weight:900;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:clip;}
+.calc-expr.long{font-size:24px}.calc-expr .op{color:var(--cobalt);padding:0 4px}.calc-expr .ph{color:#B7BDD3}
+.calc-prev{text-align:right;font-size:14px;font-weight:900;color:var(--cobalt);min-height:18px;margin-top:-4px}
+.calc{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.ck{height:50px;border:2px solid var(--ink);border-radius:16px;background:#fff;color:var(--ink);font-size:22px;font-weight:900;cursor:pointer;box-shadow:0 2px 0 var(--ink);display:flex;align-items:center;justify-content:center;font-family:'Nunito',system-ui,sans-serif;-webkit-user-select:none;user-select:none}
+.ck:active{transform:translateY(2px);box-shadow:none}
+.ck.op{background:#E6ECFF;color:var(--cobalt-dark);font-size:26px}.ck.eq{background:var(--cobalt);color:#fff;font-size:26px}.ck.del{background:#FFF4D6}.ck.clr{background:#F3F6FF;font-size:16px}
+.sheet-foot{position:sticky;bottom:calc(-24px - var(--safe-b));margin:0 -20px calc(-24px - var(--safe-b));padding:12px 20px calc(18px + var(--safe-b));background:linear-gradient(rgba(255,253,247,0),var(--cream) 22%);display:flex;flex-direction:column;gap:6px;z-index:2}
 .pinwrap{max-width:420px;margin:0 auto;min-height:100vh;min-height:100dvh;padding:calc(24px + var(--safe-t)) 24px calc(24px + var(--safe-b));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center}
 .pindots{display:flex;gap:12px;justify-content:center;min-height:24px}
 .pindot{width:18px;height:18px;border-radius:50%;border:2.5px solid var(--ink);background:#fff;transition:background .15s}
@@ -156,29 +167,33 @@ var CAT_STYLE = {
   'Setor Tabungan': { c: '#14B8A6', d: '#0F766E', t: '#E2F7F4', i: 'ST' },
   'Setor Investasi': { c: '#0EA5E9', d: '#0369A1', t: '#E0F2FE', i: 'SI' }
 };
+var CAT_ICON = {
+  'Makan & Minum': 'food', 'Transportasi': 'car', 'Belanja': 'bag', 'Tagihan': 'bill', 'Hiburan': 'game', 'Kesehatan': 'health',
+  'Lainnya': 'dots', 'Gaji': 'cash', 'Bayar Hutang': 'payhand', 'Setor Tabungan': 'piggy', 'Setor Investasi': 'trend'
+};
 var EXTRA_STYLES = [
   { c: '#F97316', d: '#9A3412', t: '#FFEDD5' }, { c: '#A855F7', d: '#7E22CE', t: '#F3E8FF' },
   { c: '#84CC16', d: '#3F6212', t: '#ECFCCB' }, { c: '#06B6D4', d: '#0E7490', t: '#CFFAFE' },
   { c: '#F43F5E', d: '#9F1239', t: '#FFE4E6' }, { c: '#64748B', d: '#334155', t: '#F1F5F9' }
 ];
 var KIND_STYLE = {
-  'Reksa dana': { d: '#1D36A8', t: '#E6ECFF', i: 'RD' }, 'Saham': { d: '#B0244F', t: '#FFE8EF', i: 'SH' },
-  'Deposito': { d: '#0B6E8A', t: '#E3F7FD', i: 'DP' }, 'Emas': { d: '#8A5A00', t: '#FFF4D6', i: 'EM' },
-  'Rekening': { d: '#1E7F4F', t: '#E3F6EC', i: 'RK' }, 'Crypto': { d: '#7E22CE', t: '#F3E8FF', i: 'CR' },
-  'Obligasi': { d: '#9A3412', t: '#FFEDD5', i: 'OB' }, 'Lainnya': { d: '#475069', t: '#EEF0F4', i: 'LN' }
+  'Reksa dana': { d: '#1D36A8', t: '#E6ECFF', i: 'RD', ic: 'pie' }, 'Saham': { d: '#B0244F', t: '#FFE8EF', i: 'SH', ic: 'candle' },
+  'Deposito': { d: '#0B6E8A', t: '#E3F7FD', i: 'DP', ic: 'bank' }, 'Emas': { d: '#8A5A00', t: '#FFF4D6', i: 'EM', ic: 'gold' },
+  'Rekening': { d: '#1E7F4F', t: '#E3F6EC', i: 'RK', ic: 'card' }, 'Crypto': { d: '#7E22CE', t: '#F3E8FF', i: 'CR', ic: 'coin' },
+  'Obligasi': { d: '#9A3412', t: '#FFEDD5', i: 'OB', ic: 'doc' }, 'Lainnya': { d: '#475069', t: '#EEF0F4', i: 'LN', ic: 'tag' }
 };
 var INV_KINDS = ['Reksa dana', 'Saham', 'Deposito', 'Emas', 'Rekening', 'Crypto', 'Obligasi', 'Lainnya'];
 var DEBT_KINDS = ['Pribadi', 'Kartu kredit', 'Paylater', 'Cicilan', 'Lainnya'];
 
 function catStyle(name) {
-  if (CAT_STYLE[name]) return CAT_STYLE[name];
+  if (CAT_STYLE[name]) return Object.assign({ ic: CAT_ICON[name] || 'tag' }, CAT_STYLE[name]);
   var h = 0; for (var k = 0; k < name.length; k++) h = (h * 31 + name.charCodeAt(k)) >>> 0;
   var s = EXTRA_STYLES[h % EXTRA_STYLES.length];
   var words = name.trim().split(/\s+/);
   var ini = (words.length > 1 ? words[0][0] + words[1][0] : name.slice(0, 2)).toUpperCase();
-  return { c: s.c, d: s.d, t: s.t, i: ini };
+  return { c: s.c, d: s.d, t: s.t, i: ini, ic: 'tag' };
 }
-function kindStyle(k) { return KIND_STYLE[k] || { d: '#475069', t: '#EEF0F4', i: (k || 'LN').slice(0, 2).toUpperCase() }; }
+function kindStyle(k) { return KIND_STYLE[k] || { d: '#475069', t: '#EEF0F4', i: (k || 'LN').slice(0, 2).toUpperCase(), ic: 'tag' }; }
 
 /* ---------- Kalimat Si Cuan ---------- */
 var ROAST = {
@@ -259,6 +274,25 @@ var IC = {
   trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
   refresh: '<path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/>',
   spinner: '<path d="M21 12a9 9 0 1 1-6.2-8.6"/>',
+  food: '<path d="M3.5 11h17a8.5 8.5 0 0 1-17 0z"/><path d="M8 3.5c-.8 1 .8 2 0 3.5M12 3c-.8 1 .8 2 0 3.5M16 3.5c-.8 1 .8 2 0 3.5"/>',
+  car: '<path d="M3 13.5l2.2-6A2 2 0 0 1 7.1 6h9.8a2 2 0 0 1 1.9 1.5l2.2 6V18H3z"/><path d="M3 13.5h18"/><circle cx="7.5" cy="18" r="2"/><circle cx="16.5" cy="18" r="2"/>',
+  bag: '<path d="M5 8h14l-1.2 12.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8z"/><path d="M9 10V6.5a3 3 0 0 1 6 0V10"/>',
+  bill: '<path d="M6 3h12v18l-2.4-1.6L13.2 21 12 20l-1.2 1-2.4-1.6L6 21z"/><path d="M9 8h6M9 12h6M9 16h3"/>',
+  game: '<rect x="2.5" y="7" width="19" height="11" rx="5.5"/><path d="M7.5 10.5v4M5.5 12.5h4"/><circle cx="15.5" cy="11.5" r="1"/><circle cx="17.8" cy="13.8" r="1"/>',
+  health: '<path d="M12 20.5s-8-4.8-8-10.6A4.4 4.4 0 0 1 12 7.2a4.4 4.4 0 0 1 8 2.7c0 5.8-8 10.6-8 10.6z"/><path d="M7.5 12.5h2.5l1.2-2.2 2 4.2 1.3-2h2"/>',
+  dots: '<circle cx="5.5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="18.5" cy="12" r="1.6"/>',
+  cash: '<rect x="2.5" y="6" width="19" height="12" rx="2.5"/><circle cx="12" cy="12" r="2.8"/><path d="M6 9.5v.01M18 14.5v.01"/>',
+  payhand: '<circle cx="15.5" cy="6.5" r="3"/><path d="M3 14h3.5l3.5 2.5h5a1.8 1.8 0 0 0 0-3.6h-3"/><path d="M3 19.5h6.5l10-4.5"/>',
+  piggy: '<path d="M4.5 11.5c0-3.3 3.4-6 7.5-6 1.4 0 2.7.3 3.8.8L19 5v3.5c.9.8 1.5 1.8 1.8 3H22v3.5h-1.6c-.5 1-1.3 1.8-2.4 2.4V20h-3v-1.6c-.9.2-1.8.3-2.8.3S10 18.6 9 18.4V20H6v-2.6c-1-1.2-1.5-2.5-1.5-3.9z"/><circle cx="16" cy="10.5" r=".9"/><path d="M10 7.5h3.5"/>',
+  tag: '<path d="M3 12.5V4h8.5L21 13.5 13.5 21z"/><circle cx="7.5" cy="8.5" r="1.6"/>',
+  pie: '<path d="M11 3.5a8.5 8.5 0 1 0 9.5 9.5H11z"/><path d="M14 2.5a8 8 0 0 1 7.5 7.5H14z"/>',
+  candle: '<path d="M6 3v18M12 5v14M18 3v14"/><rect x="4.2" y="7" width="3.6" height="8" rx="1"/><rect x="10.2" y="9" width="3.6" height="6" rx="1"/><rect x="16.2" y="6" width="3.6" height="7" rx="1"/>',
+  bank: '<path d="M3 9.5L12 4l9 5.5z"/><path d="M5.5 10v8M10 10v8M14 10v8M18.5 10v8M3 20.5h18"/>',
+  gold: '<path d="M2.5 20l2-5.5h6l2 5.5z"/><path d="M11.5 20l2-5.5h6l2 5.5z"/><path d="M7 14.5l2-5.5h6l2 5.5"/>',
+  card: '<rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19M6 15h4"/>',
+  coin: '<circle cx="12" cy="12" r="9"/><path d="M9.5 7.5v9M12.5 6.5v2M12.5 15.5v2M9.5 8h4.2a2 2 0 0 1 0 4H9.5h4.8a2 2 0 0 1 0 4H9.5"/>',
+  doc: '<path d="M6 3h9l4 4v14H6z"/><path d="M14.5 3v4.5H19M9 12.5h7M9 16.5h5"/>',
+  backspace: '<path d="M8 5h12a1.5 1.5 0 0 1 1.5 1.5v11A1.5 1.5 0 0 1 20 19H8l-6-7z"/><path d="M11.5 9.5l5 5M16.5 9.5l-5 5"/>',
   lock: '<rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'
 };
 function icon(name, size, sw, extra) {
@@ -308,13 +342,56 @@ var S = {
   toast: null, lineIdx: 0, search: '', fCat: 'Semua', fDate: 'all', planTab: 'budget', assetTab: 'invest',
   lastSync: 0
 };
-function emptyForm() { return { id: null, type: 'out', amount: '', category: '', date: todayISO(), note: '' }; }
+function emptyForm() { return { id: null, type: 'out', expr: '', category: '', date: todayISO(), note: '' }; }
+
+/* ---------- Kalkulator ---------- */
+function calcEval(expr) {
+  var toks = String(expr || '').match(/\d+|[+-]/g) || [], total = 0, sign = 1, any = false;
+  toks.forEach(function (t) { if (t === '+') sign = 1; else if (t === '-') sign = -1; else { total += sign * Number(t); any = true; } });
+  return any ? total : 0;
+}
+function calcSize(e) { var n = (e || '').length + Math.floor((e || '').replace(/[+-]/g, '').length / 3); return n <= 9 ? 34 : n <= 13 ? 28 : n <= 17 ? 23 : n <= 22 ? 19 : 16; }
+function calcHasOp(expr) { return /\d[+-]\d/.test(expr || ''); }
+function calcFormat(expr) {
+  if (!expr) return '<span class="ph">0</span>';
+  return (expr.match(/\d+|[+-]/g) || []).map(function (t) { return t === '+' || t === '-' ? '<span class="op">' + (t === '+' ? '+' : '−') + '</span>' : thousands(Number(t)); }).join('');
+}
+function calcKey(k) {
+  var e = S.form.expr || '', last = e.slice(-1), isOp = function (c) { return c === '+' || c === '-'; };
+  var curNum = (e.match(/\d+$/) || [''])[0];
+  if (/^\d$/.test(k)) { if (curNum.length >= 12) return; if (curNum === '0') e = e.slice(0, -1); e += k; }
+  else if (k === '000') { if (!curNum || curNum === '0' || curNum.length > 9) return; e += '000'; }
+  else if (k === '+' || k === '-') { if (!e) return; if (isOp(last)) e = e.slice(0, -1); e += k; }
+  else if (k === 'del') e = e.slice(0, -1);
+  else if (k === 'clr') e = '';
+  else if (k === '=') { if (isOp(last)) e = e.slice(0, -1); var v = calcEval(e); e = v > 0 ? String(v) : ''; if (v <= 0 && calcHasOp(S.form.expr)) { S.formError = 'Hasilnya nol atau minus. Cek lagi hitungannya ya.'; renderSheet(false); return; } }
+  S.form.expr = e; S.formError = '';
+  updateCalc();
+}
+function updateCalc() {
+  var el = document.getElementById('calcExpr'), pv = document.getElementById('calcPrev');
+  if (!el) return;
+  var e = S.form.expr || '';
+  el.innerHTML = calcFormat(e);
+  el.style.fontSize = calcSize(e) + 'px';
+  pv.textContent = calcHasOp(e) ? '= ' + rp(calcEval(e)) : '';
+  var er = document.querySelector('.sheet .errbox'); if (er) er.remove();
+}
+function calcPad() {
+  var k = function (v, label, cls, aria) { return '<button class="ck' + (cls ? ' ' + cls : '') + '" data-act="calc" data-v="' + v + '"' + (aria ? ' aria-label="' + aria + '"' : '') + '>' + label + '</button>'; };
+  return '<div class="calc">' +
+    k('7', '7') + k('8', '8') + k('9', '9') + k('del', icon('backspace', 24, 2.2), 'del', 'Hapus satu angka') +
+    k('4', '4') + k('5', '5') + k('6', '6') + k('-', '−', 'op', 'Kurang') +
+    k('1', '1') + k('2', '2') + k('3', '3') + k('+', '+', 'op', 'Tambah') +
+    k('clr', 'C', 'clr', 'Hapus semua') + k('0', '0') + k('000', '000') + k('=', '=', 'eq', 'Sama dengan') + '</div>';
+}
 
 /* ---------- Server (Google Apps Script) ---------- */
 var API_URL = 'https://script.google.com/macros/s/AKfycbzlDDHrKWn6VwkvIAQTkEIAiGAaqNZt-NlJ5syUVvoHn0NO6mG0XbxOgnw45xZaNufnCQ/exec';
 var TOKEN_KEY = 'cuan-token-v1';
 S.token = store(TOKEN_KEY) || '';
-S.pin = { mode: 'checking', value: '', first: '', err: '', busy: false, shake: 0 };
+S.pin = { mode: 'checking', value: '', first: '', err: '', busy: false, shake: 0, len: Number(store('cuan-pin-len')) || 0 };
+var NEW_PIN_LEN = 6;
 function api(body) {
   return fetch(API_URL, { method: 'POST', body: JSON.stringify(body), redirect: 'follow' })
     .catch(function () { throw new Error('Nggak bisa nyambung ke server. Cek internet ya.'); })
@@ -342,12 +419,12 @@ function load(silent) {
 function clearLocal() { try { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(CACHE_KEY); } catch (e) { } }
 function lockApp(msg) {
   S.token = ''; S.data = null; S.sheet = null; S.confirm = false; clearLocal();
-  S.pin = { mode: 'login', value: '', first: '', err: msg || '', busy: false, shake: 0 };
+  S.pin = { mode: 'login', value: '', first: '', err: msg || '', busy: false, shake: 0, len: Number(store('cuan-pin-len')) || 0 };
   renderAll();
 }
 function checkPin() {
   S.pin.mode = 'checking'; renderMain(false);
-  api({ fn: 'pinStatus' }).then(function (d) { S.pin.mode = d.hasPin ? 'login' : 'create'; S.pin.err = ''; renderMain(false); })
+  api({ fn: 'pinStatus' }).then(function (d) { S.pin.mode = d.hasPin ? 'login' : 'create'; S.pin.err = ''; if (d.len) { S.pin.len = d.len; store('cuan-pin-len', String(d.len)); } renderMain(false); })
     .catch(function (e) { S.pin.mode = 'offline'; S.pin.err = errMsg(e); renderMain(false); });
 }
 
@@ -356,7 +433,7 @@ function screenPin() {
   var P = S.pin, title, sub, mood = 'happy';
   if (P.mode === 'checking') { title = 'Sebentar…'; sub = 'Cuan lagi ngecek kunci rumah.'; mood = 'sleepy'; }
   else if (P.mode === 'offline') { title = 'Nggak nyambung'; sub = 'Cuan nggak bisa ngobrol sama server. Cek internet lalu coba lagi.'; mood = 'cry'; }
-  else if (P.mode === 'create') { title = 'Bikin PIN dulu'; sub = 'PIN 4–6 angka ini yang ngunci catatan keuanganmu. Jangan kasih tahu siapa-siapa, termasuk Cuan.'; }
+  else if (P.mode === 'create') { title = 'Bikin PIN dulu'; sub = 'PIN 6 angka ini yang ngunci catatan keuanganmu. Jangan kasih tahu siapa-siapa, termasuk Cuan.'; }
   else if (P.mode === 'confirm') { title = 'Ulangi PIN-nya'; sub = 'Biar Cuan yakin kamu nggak salah ketik.'; }
   else { title = 'Masukin PIN'; sub = 'Cuan jagain dompetmu. Siapa kamu?'; mood = 'proud'; }
   if (P.err && P.mode !== 'offline') mood = 'shock';
@@ -364,31 +441,45 @@ function screenPin() {
     '<div><div class="chewy" style="font-size:34px;color:var(--cobalt);line-height:1.1">' + title + '</div><div class="sub" style="margin-top:6px">' + sub + '</div></div>';
   if (P.mode === 'checking') return h + '<div class="skeleton" style="width:200px;height:20px"></div></div>';
   if (P.mode === 'offline') return h + '<div class="sub" style="font-size:12px">' + esc(P.err) + '</div><button class="btn" style="max-width:300px" data-act="pinRetry">Coba lagi</button></div>';
-  var dots = ''; for (var i = 0; i < 6; i++) dots += '<span class="pindot' + (i < P.value.length ? ' on' : '') + '"' + (i >= 4 && P.value.length <= i ? ' style="opacity:.35"' : '') + '></span>';
+  var need = pinNeed(), nd = need || 6, dots = '';
+  for (var i = 0; i < nd; i++) dots += '<span class="pindot' + (i < P.value.length ? ' on' : '') + '"></span>';
   h += '<div class="pindots' + (P.shake ? ' shake' : '') + '" aria-label="' + P.value.length + ' angka dimasukkan">' + dots + '</div>';
-  h += '<div role="alert" style="min-height:20px;font-size:13px;font-weight:900;color:#B3261E">' + esc(P.err) + '</div>';
-  var keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'del', '0', 'ok'];
+  h += '<div role="alert" style="min-height:20px;font-size:13px;font-weight:900;color:#B3261E">' + (P.busy ? '<span style="color:var(--cobalt)">Ngecek PIN…</span>' : esc(P.err)) + '</div>';
+  var keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', need ? '' : 'ok', '0', 'del'];
   h += '<div class="keypad">' + keys.map(function (k) {
-    if (k === 'del') return '<button class="key soft" data-act="pinKey" data-v="del" aria-label="Hapus"' + (P.busy ? ' disabled' : '') + '>Hapus</button>';
-    if (k === 'ok') return '<button class="key ok" data-act="pinKey" data-v="ok" aria-label="OK"' + (P.busy ? ' disabled' : '') + '>' + (P.busy ? icon('spinner', 24, 3, ' class="spin"') : 'OK') + '</button>';
+    if (k === '') return '<span></span>';
+    if (k === 'del') return '<button class="key soft" data-act="pinKey" data-v="del" aria-label="Hapus"' + (P.busy ? ' disabled' : '') + '>' + icon('backspace', 26, 2.2) + '</button>';
+    if (k === 'ok') return '<button class="key ok" data-act="pinKey" data-v="ok" aria-label="OK"' + (P.busy ? ' disabled' : '') + '>OK</button>';
     return '<button class="key" data-act="pinKey" data-v="' + k + '"' + (P.busy ? ' disabled' : '') + '>' + k + '</button>';
   }).join('') + '</div>';
+  if (P.mode === 'login' && !need) h += '<div class="sub" style="font-size:12px;max-width:300px">Tekan OK sekali ini aja. Habis itu Cuan hafal, PIN langsung masuk.</div>';
   if (P.mode === 'login') h += '<div class="sub" style="font-size:12px;max-width:300px">Lupa PIN? Jalankan fungsi <b>resetPin</b> di editor Apps Script, lalu buat PIN baru di sini.</div>';
   return h + '</div>';
 }
+function pinNeed() { var P = S.pin; return P.mode === 'login' ? (P.len || 0) : NEW_PIN_LEN; }
 function pinKey(k) {
   var P = S.pin; if (P.busy || ['login', 'create', 'confirm'].indexOf(P.mode) < 0) return;
   P.shake = 0;
   if (k === 'del') { P.value = P.value.slice(0, -1); P.err = ''; renderMain(false); return; }
-  if (k !== 'ok') { if (P.value.length < 6) P.value += k; P.err = ''; renderMain(false); return; }
+  var need = pinNeed();
+  if (k !== 'ok') {
+    if (P.value.length >= (need || 6)) return;
+    P.value += k; P.err = '';
+    if (need && P.value.length === need) { renderMain(false); setTimeout(function () { pinSubmit(); }, 120); return; }
+    renderMain(false); return;
+  }
+  pinSubmit();
+}
+function pinSubmit() {
+  var P = S.pin;
   if (P.value.length < 4) { P.err = 'PIN minimal 4 angka.'; P.shake = 1; renderMain(false); return; }
   if (P.mode === 'create') { P.first = P.value; P.value = ''; P.mode = 'confirm'; renderMain(false); return; }
   if (P.mode === 'confirm' && P.value !== P.first) { P.mode = 'create'; P.first = ''; P.value = ''; P.err = 'PIN-nya beda. Ulangi dari awal ya.'; P.shake = 1; renderMain(false); return; }
-  var created = P.mode === 'confirm';
+  var created = P.mode === 'confirm', len = P.value.length;
   P.busy = true; renderMain(false);
   api(created ? { fn: 'createPin', pin: P.value } : { fn: 'login', pin: P.value }).then(function (d) {
-    S.token = d.token; store(TOKEN_KEY, d.token);
-    S.pin = { mode: 'login', value: '', first: '', err: '', busy: false, shake: 0 };
+    S.token = d.token; store(TOKEN_KEY, d.token); store('cuan-pin-len', String(len));
+    S.pin = { mode: 'login', value: '', first: '', err: '', busy: false, shake: 0, len: len };
     renderAll(); load(false);
     toast(created ? 'PIN berhasil dibuat!' : 'Selamat datang lagi!', created ? 'Cuan sekarang jaga pintu dompetmu.' : 'Cuan kangen. Yuk nyatet.', 'proud');
   }).catch(function (e) {
@@ -477,7 +568,7 @@ function compute() {
 }
 
 /* ---------- Komponen kecil ---------- */
-function iniBadge(s, size, fs, extra) { return '<div class="badge-ini" style="width:' + size + 'px;height:' + size + 'px;border-radius:' + Math.round(size / 3) + 'px;background:' + s.t + ';color:' + s.d + ';font-size:' + (fs || 15) + 'px;' + (extra || '') + '">' + esc(s.i) + '</div>'; }
+function iniBadge(s, size, fs, extra) { return '<div class="badge-ini" style="width:' + size + 'px;height:' + size + 'px;border-radius:' + Math.round(size / 3) + 'px;background:' + s.t + ';color:' + s.d + ';' + (extra || '') + '" aria-hidden="true">' + icon(s.ic || 'tag', Math.round(size * 0.56), 2.2) + '</div>'; }
 function txRow(t, sub) {
   var s = catStyle(t.category);
   return '<button class="txbtn press" data-act="detail" data-id="' + esc(t.id) + '">' + iniBadge(s, 42) +
@@ -720,17 +811,16 @@ function sheetAdd() {
   var T = todayISO(), Y = addDays(T, -1);
   return sheetHead(f.id ? 'Edit transaksi' : 'Catat transaksi') +
     segs([['out', 'Pengeluaran'], ['in', 'Pemasukan']], f.type, 'formType') +
-    '<div style="display:flex;flex-direction:column;gap:8px"><label class="lbl" for="nominal">Nominal</label><div class="money"><span class="chewy" style="font-size:26px;color:var(--cobalt)">Rp</span><input id="nominal" data-in="amount" inputmode="numeric" autocomplete="off" placeholder="0" value="' + fmtDigits(f.amount) + '"></div>' +
-    '<div class="hscroll">' + [10000, 20000, 50000, 100000].map(function (v) { return '<button class="chip" data-act="addAmt" data-v="' + v + '">+' + (v / 1000) + ' rb</button>'; }).join('') + '</div></div>' +
+    '<div style="display:flex;flex-direction:column;gap:8px"><div class="lbl" id="nominal-lbl">Nominal</div><div class="calc-display" role="status" aria-labelledby="nominal-lbl"><span class="chewy" style="font-size:26px;color:var(--cobalt)">Rp</span><div class="calc-expr" id="calcExpr" style="font-size:' + calcSize(f.expr) + 'px"><bdi>' + calcFormat(f.expr) + '</bdi></div></div><div class="calc-prev" id="calcPrev">' + (calcHasOp(f.expr) ? '= ' + rp(calcEval(f.expr)) : '') + '</div>' + calcPad() + '</div>' +
     '<div style="display:flex;flex-direction:column;gap:8px"><div class="lbl">Kategori</div><div id="catGrid" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px">' + cats.map(function (c) {
       var s = catStyle(c);
-      return '<button class="cat' + (f.category === c ? ' on' : '') + '" data-act="pickCat" data-v="' + esc(c) + '" aria-pressed="' + (f.category === c) + '"><span class="badge-ini" style="width:36px;height:36px;border-radius:12px;background:' + s.t + ';color:' + s.d + ';font-size:14px">' + esc(s.i) + '</span><span style="line-height:1.2;text-align:center">' + esc(c) + '</span></button>';
+      return '<button class="cat' + (f.category === c ? ' on' : '') + '" data-act="pickCat" data-v="' + esc(c) + '" aria-pressed="' + (f.category === c) + '"><span class="badge-ini" style="width:36px;height:36px;border-radius:12px;background:' + s.t + ';color:' + s.d + '" aria-hidden="true">' + icon(s.ic || 'tag', 20, 2.2) + '</span><span style="line-height:1.2;text-align:center">' + esc(c) + '</span></button>';
     }).join('') + '</div></div>' +
     '<div style="display:flex;flex-direction:column;gap:8px"><label class="lbl" for="tanggal">Tanggal</label><div class="row" style="gap:8px"><input id="tanggal" class="field grow" type="date" data-ch="formDate" value="' + esc(f.date) + '"><button class="chip' + (f.date === T ? ' on' : '') + '" data-act="setDate" data-v="' + T + '" style="height:48px;border-radius:14px">Hari ini</button><button class="chip' + (f.date === Y ? ' on' : '') + '" data-act="setDate" data-v="' + Y + '" style="height:48px;border-radius:14px">Kemarin</button></div></div>' +
     '<div style="display:flex;flex-direction:column;gap:8px"><label class="lbl" for="catatan">Catatan <span style="text-transform:none;font-weight:700;color:var(--muted)">(opsional)</span></label><input id="catatan" class="field" type="text" maxlength="200" data-in="note" placeholder="mis. kopi susu biar melek" value="' + esc(f.note) + '"></div>' +
     (S.formError ? '<div role="alert" class="errbox pop">' + cuan('shock', 44) + '<span>' + esc(S.formError) + '</span></div>' : '') +
-    '<button class="btn press" data-act="save"' + (S.saving ? ' disabled' : '') + '>' + (S.saving ? icon('spinner', 20, 3, ' class="spin"') + 'Cuan lagi lari ke Google Sheets…' : icon('check', 20, 3) + (f.id ? 'Simpan perubahan' : 'Simpan')) + '</button>' +
-    '<div class="sub" style="font-size:12px;text-align:center;margin-top:-4px">Masuk sebagai ' + (f.id ? 'perubahan baris' : 'baris baru') + ' di sheet “' + (f.type === 'in' ? 'Pemasukan' : 'Pengeluaran') + '”</div>';
+    '<div class="sheet-foot"><button class="btn press" data-act="save"' + (S.saving ? ' disabled' : '') + '>' + (S.saving ? icon('spinner', 20, 3, ' class="spin"') + 'Cuan lagi lari ke Google Sheets…' : icon('check', 20, 3) + (f.id ? 'Simpan perubahan' : 'Simpan')) + '</button>' +
+    '<div class="sub" style="font-size:12px;text-align:center">Masuk sebagai ' + (f.id ? 'perubahan baris' : 'baris baru') + ' di sheet “' + (f.type === 'in' ? 'Pemasukan' : 'Pengeluaran') + '”</div></div>';
 }
 function sheetDetail() {
   var t = S.data.transactions.filter(function (x) { return x.id === S.detailId; })[0];
@@ -781,7 +871,7 @@ function party() {
   setTimeout(function () { L.innerHTML = ''; }, 3400);
 }
 function renderAll() { renderMain(false); renderNav(); renderSheet(false); renderConfirm(); }
-function openSheet(kind) { S.sheet = kind; renderSheet(true); setTimeout(function () { var el = document.querySelector('.sheet input:not([type=checkbox]):not([type=date]):not([type=month])'); if (el && kind !== 'detail' && window.innerWidth > 0) el.focus({ preventScroll: true }); }, 360); }
+function openSheet(kind) { S.sheet = kind; renderSheet(true); setTimeout(function () { var el = document.querySelector('.sheet input:not([type=checkbox]):not([type=date]):not([type=month])'); if (el && kind === 'quick' && window.innerWidth > 0) el.focus({ preventScroll: true }); }, 360); }
 function closeSheet() { if (S.saving || S.qSaving) return; S.sheet = null; S.quick = null; S.qError = ''; S.formError = ''; S.confirm = false; renderSheet(false); renderConfirm(); }
 
 /* ---------- Aksi ---------- */
@@ -808,11 +898,12 @@ var ACT = {
   close: closeSheet,
   formType: function (d) { S.form.type = d.v; S.form.category = d.v === 'in' && S.data.categories.in.length === 1 ? S.data.categories.in[0] : ''; S.formError = ''; renderSheet(false); },
   pickCat: function (d) { S.form.category = d.v; S.formError = ''; document.querySelectorAll('#catGrid .cat').forEach(function (b) { var on = b.dataset.v === d.v; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); }); var e = document.querySelector('.sheet .errbox'); if (e) e.remove(); },
+  calc: function (d) { calcKey(d.v); },
   addAmt: function (d) { S.form.amount = String(Number(S.form.amount || 0) + Number(d.v)); var el = document.getElementById('nominal'); if (el) el.value = fmtDigits(S.form.amount); },
   setDate: function (d) { S.form.date = d.v; renderSheet(false); },
   save: function () {
-    var f = S.form, n = Number(f.amount), err = '';
-    if (!f.amount) err = 'Eh, nominalnya belum diisi!';
+    var f = S.form, n = calcEval(f.expr), err = '';
+    if (!f.expr) err = 'Eh, nominalnya belum diisi!';
     else if (!(n > 0)) err = 'Nominal harus lebih dari 0 dong.';
     else if (!f.category) err = 'Pilih kategorinya dulu ya.';
     else if (!f.date) err = 'Tanggalnya belum diisi.';
@@ -830,7 +921,7 @@ var ACT = {
   detail: function (d) { S.detailId = d.id; S.confirm = false; openSheet('detail'); },
   edit: function () {
     var t = S.data.transactions.filter(function (x) { return x.id === S.detailId; })[0]; if (!t) return;
-    S.form = { id: t.id, type: t.type, amount: String(Math.round(t.amount)), category: t.category, date: t.date, note: t.note || '' }; S.formError = ''; S.sheet = 'add'; renderSheet(false);
+    S.form = { id: t.id, type: t.type, expr: String(Math.round(t.amount)), category: t.category, date: t.date, note: t.note || '' }; S.formError = ''; S.sheet = 'add'; renderSheet(false);
   },
   askDelete: function () { S.confirm = true; renderConfirm(); },
   cancelDelete: function () { S.confirm = false; renderConfirm(); },
@@ -965,8 +1056,15 @@ document.addEventListener('keydown', function (e) {
   if (!S.token && e.key === 'Backspace') { pinKey('del'); return; }
   if (!S.token && e.key === 'Enter') { pinKey('ok'); return; }
   if (e.key === 'Escape') { if (S.confirm) ACT.cancelDelete(); else if (S.sheet) closeSheet(); }
+  if (S.sheet === 'add' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') {
+    var map = { 'Backspace': 'del', 'Delete': 'clr', 'Escape': null, '=': '=', 'Enter': '=', '+': '+', '-': '-' };
+    if (/^[0-9]$/.test(e.key)) { e.preventDefault(); calcKey(e.key); return; }
+    if (map[e.key]) { e.preventDefault(); if (e.key === 'Enter' && !calcHasOp(S.form.expr)) ACT.save(); else calcKey(map[e.key]); return; }
+  }
   if (e.key === 'Enter' && S.sheet && e.target.tagName === 'INPUT') { e.preventDefault(); if (S.sheet === 'add') ACT.save(); else if (S.sheet === 'quick') submitQuick(); }
 });
+document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
+document.addEventListener('dblclick', function (e) { e.preventDefault(); }, { passive: false });
 document.addEventListener('visibilitychange', function () { if (!document.hidden && S.token && S.data && Date.now() - S.lastSync > 60000 && !S.saving && !S.qSaving) load(true); });
 
 /* ---------- Mulai ---------- */
