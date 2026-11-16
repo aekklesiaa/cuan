@@ -106,6 +106,7 @@ select.field{background-image:linear-gradient(45deg,transparent 50%,var(--ink) 5
 .backdrop{position:fixed;inset:0;z-index:35;border:0;background:rgba(27,37,89,.45);cursor:default;width:100%}
 .sheet{position:fixed;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;z-index:40;background:var(--cream);border:2px solid var(--ink);border-bottom:0;border-radius:30px 30px 0 0;padding:10px 20px calc(24px + var(--safe-b));max-height:92vh;max-height:92dvh;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;display:flex;flex-direction:column;gap:14px}
 .handle{width:44px;height:6px;border-radius:999px;background:var(--ink);align-self:center;flex:none}
+.trashbtn{margin-left:10px;width:36px;height:36px;flex:none;border:2px solid var(--ink);border-radius:12px;background:#fff;color:#B3261E;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 0 var(--ink)}.trashbtn:active{transform:translateY(2px);box-shadow:none}
 .xbtn{width:44px;height:44px;flex:none;border:2px solid var(--ink);border-radius:14px;background:#fff;color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 0 var(--ink)}
 .confirm{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(27,37,89,.55)}
 .toast{position:fixed;top:calc(14px + var(--safe-t));left:14px;right:14px;max-width:452px;margin:0 auto;z-index:60;color:#fff;background:var(--ink);border:2px solid var(--ink);border-radius:20px;padding:8px 14px 8px 8px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 0 #0E1430}
@@ -730,7 +731,7 @@ function screenPlan(V) {
         hint = 'Kurang ' + rp(need) + ' · nabung ' + rp(Math.ceil(need / ml / 1000) * 1000) + '/bulan selama ' + ml + ' bulan';
       } else hint = 'Kurang ' + rp(need);
       var dl = g.deadline ? 'Target ' + BULAN[+g.deadline.slice(5, 7) - 1] + ' ' + g.deadline.slice(0, 4) : 'Tanpa tenggat';
-      return '<div class="card" style="display:flex;flex-direction:column;gap:12px"><div class="between" style="align-items:flex-start"><div class="grow"><div class="h2" style="line-height:1.1">' + esc(g.name) + '</div><div class="sub" style="font-size:12px">' + dl + '</div></div><div class="sticker" style="background:var(--yellow);transform:rotate(3deg)">' + Math.min(100, Math.round(p)) + '%</div></div>' +
+      return '<div class="card" style="display:flex;flex-direction:column;gap:12px"><div class="between" style="align-items:flex-start"><div class="grow"><div class="h2" style="line-height:1.1">' + esc(g.name) + '</div><div class="sub" style="font-size:12px">' + dl + '</div></div><div class="sticker" style="background:var(--yellow);transform:rotate(3deg)">' + Math.min(100, Math.round(p)) + '%</div>' + '<button class="trashbtn" data-act="askDelItem" data-k="goal" data-v="' + esc(g.id) + '" aria-label="Hapus ' + esc(g.name) + '">' + icon('trash', 18, 2.2) + '</button>' + '</div>' +
         '<div style="display:flex;align-items:baseline;gap:6px;flex-wrap:wrap"><span style="font-size:18px;font-weight:900">' + rp(g.saved) + '</span><span class="sub">dari ' + rp(g.target) + '</span></div>' + track(p >= 100 ? 'good' : 'ok', Math.min(100, p).toFixed(1), 16) +
         '<div style="font-size:12px;font-weight:800">' + hint + '</div><div class="row" style="gap:8px"><button class="btn sm yellow press grow" data-act="qGoalAdd" data-v="' + esc(g.id) + '">Masukin celengan</button><button class="btn-soft" style="height:46px" data-act="qGoalTake" data-v="' + esc(g.id) + '">Ambil</button></div></div>';
     }).join('');
@@ -753,7 +754,7 @@ function screenAssets(V) {
       var k = kindStyle(x.kind), p = x.nilai - x.modal, pp = x.modal ? p / x.modal * 100 : 0;
       return '<div class="card" style="display:flex;flex-direction:column;gap:12px"><div class="row">' + iniBadge(k, 42) +
         '<div class="grow"><div class="ellipsis" style="font-size:14px;font-weight:900">' + esc(x.name) + '</div><div class="sub" style="font-size:12px">' + esc([x.platform, x.kind].filter(Boolean).join(' · ')) + '</div></div>' +
-        '<div style="text-align:right"><div style="font-size:14px;font-weight:900">' + rp(x.nilai) + '</div><div class="' + (p > 0 ? 'pos' : p < 0 ? 'neg' : 'muted') + '" style="font-size:12px;font-weight:900">' + (p === 0 ? '±0%' : (p > 0 ? '▲ ' : '▼ ') + rp(Math.abs(p)) + ' (' + Math.abs(pp).toFixed(1).replace('.', ',') + '%)') + '</div></div></div>' +
+        '<div style="text-align:right"><div style="font-size:14px;font-weight:900">' + rp(x.nilai) + '</div><div class="' + (p > 0 ? 'pos' : p < 0 ? 'neg' : 'muted') + '" style="font-size:12px;font-weight:900">' + (p === 0 ? '±0%' : (p > 0 ? '▲ ' : '▼ ') + rp(Math.abs(p)) + ' (' + Math.abs(pp).toFixed(1).replace('.', ',') + '%)') + '</div></div>' + '<button class="trashbtn" data-act="askDelItem" data-k="inv" data-v="' + esc(x.id) + '" aria-label="Hapus ' + esc(x.name) + '">' + icon('trash', 18, 2.2) + '</button>' + '</div>' +
         '<div class="sub" style="font-size:12px">Modal ' + rp(x.modal) + (x.updated ? ' · update ' + dShort(x.updated) : '') + '</div>' +
         '<div class="grid3"><button class="btn-soft" data-act="qInv" data-k="Setor" data-v="' + esc(x.id) + '">Setor</button><button class="btn-soft" data-act="qInv" data-k="Tarik" data-v="' + esc(x.id) + '">Tarik</button><button class="btn-soft" data-act="qInv" data-k="Update Nilai" data-v="' + esc(x.id) + '">Update nilai</button></div></div>';
     }).join('');
@@ -762,7 +763,7 @@ function screenAssets(V) {
     if (!D.debts.length) h += '<div class="card row">' + cuan('proud', 64) + '<div class="sub">Belum ada hutang yang dicatat. Semoga memang nggak ada ya!</div></div>';
     h += D.debts.map(function (x) {
       var left = x.total - x.paid, done = left <= 0, w = x.total ? x.paid / x.total * 100 : 0;
-      return '<div class="card" style="display:flex;flex-direction:column;gap:12px"><div class="between" style="align-items:flex-start"><div class="grow"><div class="h2" style="line-height:1.1">' + esc(x.name) + '</div><div class="sub" style="font-size:12px">' + esc(x.kind) + '</div></div><div class="sticker" style="background:' + (done ? '#2BB673' : 'var(--yellow)') + ';transform:rotate(3deg)">' + (done ? 'LUNAS!' : Math.round(w) + '% terbayar') + '</div></div>' +
+      return '<div class="card" style="display:flex;flex-direction:column;gap:12px"><div class="between" style="align-items:flex-start"><div class="grow"><div class="h2" style="line-height:1.1">' + esc(x.name) + '</div><div class="sub" style="font-size:12px">' + esc(x.kind) + '</div></div><div class="sticker" style="background:' + (done ? '#2BB673' : 'var(--yellow)') + ';transform:rotate(3deg)">' + (done ? 'LUNAS!' : Math.round(w) + '% terbayar') + '</div>' + '<button class="trashbtn" data-act="askDelItem" data-k="debt" data-v="' + esc(x.id) + '" aria-label="Hapus ' + esc(x.name) + '">' + icon('trash', 18, 2.2) + '</button>' + '</div>' +
         '<div><div class="sub" style="font-size:12px">Sisa hutang</div><div class="' + (done ? 'pos' : 'neg') + '" style="font-size:24px;font-weight:900">' + rp(left) + '</div></div>' + track('good', w.toFixed(1), 16) +
         '<div style="font-size:12px;font-weight:800">Terbayar ' + rp(x.paid) + ' dari total ' + rp(x.total) + '</div>' +
         '<div class="grid2" style="gap:8px"><button class="btn sm press" data-act="qDebt" data-k="Bayar" data-v="' + esc(x.id) + '">Bayar</button><button class="btn sm ghost press" data-act="qDebt" data-k="Tambah" data-v="' + esc(x.id) + '">Tambah hutang</button></div></div>';
@@ -851,11 +852,20 @@ function sheetQuick() {
 function renderConfirm() {
   var L = document.getElementById('layer-confirm');
   if (!S.confirm) { L.innerHTML = ''; return; }
+  if (S.delItem) return renderConfirmItem(L);
   var t = S.data.transactions.filter(function (x) { return x.id === S.detailId; })[0];
   if (!t) { S.confirm = false; L.innerHTML = ''; return; }
   L.innerHTML = '<div class="confirm backdrop-anim"><div class="pop" role="alertdialog" aria-modal="true" aria-labelledby="hapus-judul" style="width:100%;max-width:420px;background:var(--cream);border:2px solid var(--ink);border-radius:26px;padding:20px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;box-shadow:0 5px 0 var(--ink)">' + cuan('shock', 96) +
     '<div id="hapus-judul" class="chewy" style="font-size:26px;color:var(--cobalt)">Yakin mau dihapus?</div><div style="font-size:14px;font-weight:600;line-height:1.5"><b>' + esc(t.note || t.category) + ' · Rp ' + thousands(t.amount) + '</b> bakal hilang dari aplikasi <i>dan</i> dari Google Sheets. Nggak bisa dibalikin, Cuan nggak punya mesin waktu.</div>' +
     '<div class="grid2" style="margin-top:6px;width:100%"><button class="btn sm ghost press" data-act="cancelDelete">Nggak jadi</button><button class="btn sm red press" data-act="doDelete"' + (S.saving ? ' disabled' : '') + '>' + (S.saving ? 'Menghapus…' : 'Hapus aja') + '</button></div></div></div>';
+}
+var DEL_LABEL = { debt: ['hutang', 'debts', 'Semua catatan bayar & tambah hutangnya ikut terhapus.'], goal: ['celengan', 'goals', 'Semua riwayat setor & ambilnya ikut terhapus.'], inv: ['aset', 'invs', 'Semua riwayat setor, tarik & update nilainya ikut terhapus.'] };
+function renderConfirmItem(L) {
+  var D = S.delItem, lb = DEL_LABEL[D.kind], x = (S.data[lb[1]] || []).filter(function (y) { return y.id === D.id; })[0];
+  if (!x) { S.confirm = false; S.delItem = null; L.innerHTML = ''; return; }
+  L.innerHTML = '<div class="confirm backdrop-anim"><div class="pop" role="alertdialog" aria-modal="true" aria-labelledby="hapus-judul" style="width:100%;max-width:420px;background:var(--cream);border:2px solid var(--ink);border-radius:26px;padding:20px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;box-shadow:0 5px 0 var(--ink)">' + cuan('shock', 96) +
+    '<div id="hapus-judul" class="chewy" style="font-size:26px;color:var(--cobalt)">Hapus ' + lb[0] + ' ini?</div><div style="font-size:14px;font-weight:600;line-height:1.5"><b>' + esc(x.name) + '</b> bakal hilang dari aplikasi <i>dan</i> Google Sheets. ' + lb[2] + ' Pengeluaran yang dulu ikut tercatat tetap ada di Riwayat. Nggak bisa dibalikin ya.</div>' +
+    '<div class="grid2" style="margin-top:6px;width:100%"><button class="btn sm ghost press" data-act="cancelDelete">Nggak jadi</button><button class="btn sm red press" data-act="doDelItem"' + (S.saving ? ' disabled' : '') + '>' + (S.saving ? 'Menghapus…' : 'Hapus aja') + '</button></div></div></div>';
 }
 var toastTimer = null;
 function toast(msg, sub, mood, isErr) {
@@ -924,7 +934,16 @@ var ACT = {
     S.form = { id: t.id, type: t.type, expr: String(Math.round(t.amount)), category: t.category, date: t.date, note: t.note || '' }; S.formError = ''; S.sheet = 'add'; renderSheet(false);
   },
   askDelete: function () { S.confirm = true; renderConfirm(); },
-  cancelDelete: function () { S.confirm = false; renderConfirm(); },
+  cancelDelete: function () { if (S.saving) return; S.confirm = false; S.delItem = null; renderConfirm(); },
+  askDelItem: function (d) { S.delItem = { kind: d.k, id: d.v }; S.confirm = true; renderConfirm(); },
+  doDelItem: function () {
+    var D = S.delItem; if (!D) return;
+    S.saving = true; renderConfirm();
+    server('deleteItem', D.kind, D.id).then(function (d) {
+      setData(d); S.saving = false; S.confirm = false; S.delItem = null; renderAll();
+      toast('Sudah dihapus', 'Hilang dari aplikasi & Google Sheets.', 'shock');
+    }).catch(function (e) { S.saving = false; S.confirm = false; S.delItem = null; renderConfirm(); toast('Gagal menghapus', errMsg(e), 'cry', true); });
+  },
   doDelete: function () {
     S.saving = true; renderConfirm();
     server('deleteTransaction', S.detailId).then(function (d) {

@@ -89,7 +89,7 @@ function doPost(e) {
     const api = {
       getAll: getAll_, saveTransaction: saveTransaction_, deleteTransaction: deleteTransaction_,
       setBudget: setBudget_, addGoal: addGoal_, goalTx: goalTx_, addDebt: addDebt_, debtTx: debtTx_,
-      addInv: addInv_, invTx: invTx_
+      addInv: addInv_, invTx: invTx_, deleteItem: deleteItem_
     };
     if (!api[fn]) throw new Error('Perintah tidak dikenal.');
     const args = Array.isArray(req.args) ? req.args : [];
@@ -237,6 +237,29 @@ function deleteTransaction_(id) {
     const found = findTxRow_(ss, String(id));
     if (!found) throw new Error('Transaksi tidak ditemukan. Mungkin sudah dihapus di spreadsheet.');
     found.t.sh.deleteRow(found.row);
+  });
+}
+
+/** Hapus satu hutang / tabungan / investasi beserta seluruh riwayatnya. kind = 'debt'|'goal'|'inv' */
+function deleteItem_(kind, id) {
+  const map = {
+    debt: { main: SHEET.DEBT, log: SHEET.DEBT_LOG, parent: 'Hutang ID', label: 'Hutang' },
+    goal: { main: SHEET.GOAL, log: SHEET.GOAL_LOG, parent: 'Tabungan ID', label: 'Target tabungan' },
+    inv: { main: SHEET.INV, log: SHEET.INV_LOG, parent: 'Investasi ID', label: 'Aset' }
+  }[kind];
+  if (!map) throw new Error('Jenis data tidak dikenal.');
+  id = String(id || '').trim();
+  if (!id) throw new Error('ID kosong.');
+  return withLock_(function (ss) {
+    const t = table_(ss, map.main), cId = col_(t, 'ID', true);
+    let row = -1;
+    t.rows.forEach(function (r, i) { if (String(r[cId]).trim() === id) row = i + 2; });
+    if (row < 0) throw new Error(map.label + ' tidak ditemukan. Mungkin sudah dihapus di spreadsheet.');
+    const log = table_(ss, map.log), cP = col_(log, map.parent, true);
+    for (let i = log.rows.length - 1; i >= 0; i--) {
+      if (String(log.rows[i][cP]).trim() === id) log.sh.deleteRow(i + 2);
+    }
+    t.sh.deleteRow(row);
   });
 }
 
