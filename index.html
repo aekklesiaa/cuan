@@ -611,7 +611,8 @@ function syncPill() {
 function billPeriod() { return (S.data.today || todayISO()).slice(0, 7); }
 function billView() {
   var T = S.data.today || todayISO(), per = T.slice(0, 7), y = +T.slice(0, 4), m = +T.slice(5, 7), dim = new Date(y, m, 0).getDate(), td = +T.slice(8, 10);
-  var list = (S.data.bills || []).map(function (b) {
+  var all = S.data.bills || [], upcoming = all.filter(function (b) { return b.start && b.start > per; });
+  var list = all.filter(function (b) { return !(b.start && b.start > per); }).map(function (b) {
     var due = Math.min(b.day, dim), p = b.paid[per], diff = due - td, st, lbl;
     if (p) { st = 'paid'; lbl = 'Lunas ' + dShort(p.date); }
     else if (diff < 0) { st = 'late'; lbl = 'Telat ' + (-diff) + ' hari'; }
@@ -623,14 +624,15 @@ function billView() {
   var ord = { late: 0, today: 1, soon: 2, later: 3, paid: 4 };
   list.sort(function (a, c) { return ord[a.st] - ord[c.st] || a.due - c.due; });
   var left = list.filter(function (x) { return !x.paid; });
-  return { per: per, month: BULAN[m - 1], list: list, paidN: list.length - left.length, leftAmt: left.reduce(function (t, x) { return t + x.b.amount; }, 0) };
+  return { per: per, month: BULAN[m - 1], list: list, upcoming: upcoming, paidN: list.length - left.length, leftAmt: left.reduce(function (t, x) { return t + x.b.amount; }, 0) };
 }
 function billsCard() {
   var B = billView();
   var h = '<div class="card" style="display:flex;flex-direction:column;gap:8px"><div class="between" style="align-items:center"><div class="row" style="gap:8px"><div class="badge-ini" style="width:36px;height:36px;border-radius:12px;background:#FFF4D6;color:#8A5A00">' + icon('bell', 20, 2.2) + '</div><div><div class="h2" style="line-height:1.1">Tagihan ' + esc(B.month) + '</div>' +
     (B.list.length ? '<div class="sub" style="font-size:12px">' + B.paidN + ' dari ' + B.list.length + ' lunas' + (B.leftAmt ? ' · sisa ' + rp(B.leftAmt) : ' · semua beres!') + '</div>' : '') + '</div></div>' +
     '<button class="editbtn" style="margin:0" data-act="qBillNew" aria-label="Tambah tagihan">' + icon('plus', 18, 2.6) + '</button></div>';
-  if (!B.list.length) h += '<div class="sub" style="font-size:13px">Belum ada tagihan rutin. Tambah asuransi, cicilan, atau uang bulanan biar Cuan yang ingetin.</div>';
+  if (!B.list.length && B.upcoming.length) h += '<div class="sub" style="font-size:13px">Belum ada tagihan bulan ini.</div>';
+  else if (!B.list.length) h += '<div class="sub" style="font-size:13px">Belum ada tagihan rutin. Tambah asuransi, cicilan, atau uang bulanan biar Cuan yang ingetin.</div>';
   h += '<div>' + B.list.map(function (x) {
     var cs = catStyle(x.b.category);
     return '<div class="bill"><button data-act="qBillEdit" data-v="' + esc(x.b.id) + '" aria-label="Ubah ' + esc(x.b.name) + '" style="border:0;background:none;padding:0;cursor:pointer">' + iniBadge(cs, 40) + '</button>' +
@@ -639,6 +641,7 @@ function billsCard() {
       (x.paid ? '<button class="paybtn done" data-act="askUnpay" data-v="' + esc(x.b.id) + '" aria-label="Batalkan pembayaran ' + esc(x.b.name) + '">' + icon('check', 16, 3) + 'Lunas</button>'
         : '<button class="paybtn" data-act="qBillPay" data-v="' + esc(x.b.id) + '">Bayar</button>') + '</div>';
   }).join('') + '</div>';
+  if (B.upcoming.length) h += '<div style="display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-radius:14px;background:#F3F6FF"><div class="lbl">Segera mulai</div>' + B.upcoming.map(function (b) { return '<button data-act="qBillEdit" data-v="' + esc(b.id) + '" style="border:0;background:none;padding:0;cursor:pointer;display:flex;flex-direction:column;gap:1px;font:inherit;font-size:13px;color:var(--ink);text-align:left"><span style="font-weight:900">' + esc(b.name) + '</span><span style="font-size:12px;font-weight:700;color:var(--muted)">Mulai ' + BULAN[+b.start.slice(5, 7) - 1] + ' · tgl ' + b.day + ' · ' + rp(b.amount) + '</span></button>'; }).join('') + '</div>';
   if (B.list.length) h += '<div class="sub" style="font-size:11px">Ketuk ikon buat ubah atau hapus tagihan. Ketuk “Lunas” buat batalin pembayaran.</div>';
   return h + '</div>';
 }
@@ -897,6 +900,7 @@ function sheetQuick() {
   if (Q.fields.indexOf('platform') >= 0) h += '<div style="display:flex;flex-direction:column;gap:8px"><label class="lbl" for="qplat">Platform / bank <span style="text-transform:none;font-weight:700;color:var(--muted)">(opsional)</span></label><input id="qplat" class="field" type="text" maxlength="60" data-in="qPlatform" value="' + esc(q.platform || '') + '" placeholder="mis. Bibit, BCA, Pegadaian"></div>';
   if (Q.fields.indexOf('kind') >= 0) h += '<div style="display:flex;flex-direction:column;gap:8px"><label class="lbl" for="qkind">Jenis</label><select id="qkind" class="field" data-ch="qKind">' + Q.kinds.map(function (k) { return '<option' + (q.kind === k ? ' selected' : '') + '>' + esc(k) + '</option>'; }).join('') + '</select></div>';
   if (Q.fields.indexOf('day') >= 0) { var dopt = ''; for (var di = 1; di <= 31; di++) dopt += '<option value="' + di + '"' + (+q.day === di ? ' selected' : '') + '>Tanggal ' + di + '</option>'; h += '<div style="display:flex;flex-direction:column;gap:8px"><label class="lbl" for="qday">Jatuh tempo tiap bulan</label><select id="qday" class="field" data-ch="qDay">' + dopt + '</select></div>'; }
+  if (Q.fields.indexOf('start') >= 0) h += '<div style="display:flex;flex-direction:column;gap:8px"><label class="lbl" for="qstart">Mulai bulan <span style="text-transform:none;font-weight:700;color:var(--muted)">(kosongkan = bulan ini)</span></label><input id="qstart" class="field" type="month" data-ch="qStart" value="' + esc(q.start || '') + '"></div>';
   if (Q.fields.indexOf('cat') >= 0) h += '<div style="display:flex;flex-direction:column;gap:8px"><label class="lbl" for="qcat">Dicatat sebagai pengeluaran</label><select id="qcat" class="field" data-ch="qCat">' + S.data.categories.out.map(function (c) { return '<option' + (q.cat === c ? ' selected' : '') + '>' + esc(c) + '</option>'; }).join('') + '</select></div>';
   if (!Q.noAmount) h += '<div style="display:flex;flex-direction:column;gap:8px"><label class="lbl" for="qnominal">' + esc(Q.amountLabel) + '</label><div class="money"><span class="chewy" style="font-size:24px;color:var(--cobalt)">Rp</span><input id="qnominal" data-in="qAmount" inputmode="numeric" autocomplete="off" placeholder="0" value="' + fmtDigits(q.amount) + '" style="font-size:28px;height:52px"></div></div>';
   if (Q.fields.indexOf('deadline') >= 0) h += '<div style="display:flex;flex-direction:column;gap:8px"><label class="lbl" for="qdl">Target tercapai bulan <span style="text-transform:none;font-weight:700;color:var(--muted)">(opsional)</span></label><input id="qdl" class="field" type="month" data-ch="qDeadline" value="' + esc(q.deadline || '') + '"></div>';
@@ -1001,10 +1005,10 @@ var ACT = {
     else if (d.k === 'debt') openQuick({ kind: 'debtEdit', id: x.id, title: 'Ubah hutang', desc: 'Sudah dibayar ' + rp(x.paid) + '. Ubah total kalau tadi salah ketik.', nameLabel: 'Nama hutang', amountLabel: 'Total hutang', cta: 'Simpan perubahan', fields: ['name', 'kind'], kinds: DEBT_KINDS }, { name: x.name, kind: x.kind || DEBT_KINDS[0], amount: String(Math.round(x.total)) });
     else openQuick({ kind: 'invEdit', id: x.id, title: 'Ubah aset', desc: 'Buat ganti nama, platform, atau jenis. Nilai diubah lewat “Update nilai”.', nameLabel: 'Nama aset', cta: 'Simpan perubahan', fields: ['name', 'platform', 'kind'], kinds: INV_KINDS, noAmount: true }, { name: x.name, platform: x.platform || '', kind: x.kind || 'Lainnya' });
   },
-  qBillNew: function () { openQuick({ kind: 'billNew', title: 'Tagihan rutin baru', desc: 'Cuan bakal ingetin tiap bulan di Beranda.', nameLabel: 'Nama tagihan', namePh: 'mis. Bayar asuransi', amountLabel: 'Nominal per bulan', cta: 'Simpan tagihan', fields: ['name', 'day', 'cat'] }, { day: '1', cat: S.data.categories.out.indexOf('Tagihan') >= 0 ? 'Tagihan' : S.data.categories.out[0] }); },
+  qBillNew: function () { openQuick({ kind: 'billNew', title: 'Tagihan rutin baru', desc: 'Cuan bakal ingetin tiap bulan di Beranda.', nameLabel: 'Nama tagihan', namePh: 'mis. Bayar asuransi', amountLabel: 'Nominal per bulan', cta: 'Simpan tagihan', fields: ['name', 'day', 'start', 'cat'] }, { day: '1', cat: S.data.categories.out.indexOf('Tagihan') >= 0 ? 'Tagihan' : S.data.categories.out[0] }); },
   qBillEdit: function (d) {
     var b = (S.data.bills || []).filter(function (x) { return x.id === d.v; })[0]; if (!b) return;
-    openQuick({ kind: 'billEdit', id: b.id, title: 'Ubah tagihan', desc: 'Pembayaran yang sudah tercatat nggak berubah.', nameLabel: 'Nama tagihan', amountLabel: 'Nominal per bulan', cta: 'Simpan perubahan', fields: ['name', 'day', 'cat'], delBtn: 'bill' }, { name: b.name, day: String(b.day), cat: b.category, amount: String(Math.round(b.amount)) });
+    openQuick({ kind: 'billEdit', id: b.id, title: 'Ubah tagihan', desc: 'Pembayaran yang sudah tercatat nggak berubah.', nameLabel: 'Nama tagihan', amountLabel: 'Nominal per bulan', cta: 'Simpan perubahan', fields: ['name', 'day', 'start', 'cat'], delBtn: 'bill' }, { name: b.name, day: String(b.day), start: b.start || '', cat: b.category, amount: String(Math.round(b.amount)) });
   },
   qBillPay: function (d) {
     var b = (S.data.bills || []).filter(function (x) { return x.id === d.v; })[0]; if (!b) return;
@@ -1084,8 +1088,8 @@ function submitQuick() {
   else if (Q.kind === 'inv') call = server('invTx', { id: Q.id, kind: Q.sub, amount: n, date: q.date || todayISO(), alsoExpense: !!q.also });
   else if (Q.kind === 'invNew') call = server('addInv', { name: name, platform: q.platform || '', kind: q.kind || 'Lainnya', modal: n, date: q.date || todayISO() });
   else if (Q.kind === 'debt') call = server('debtTx', { id: Q.id, kind: Q.sub, amount: n, date: q.date, alsoExpense: !!q.also });
-  else if (Q.kind === 'billNew') call = server('addBill', { name: name, day: q.day, amount: n, category: q.cat });
-  else if (Q.kind === 'billEdit') call = server('editItem', 'bill', Q.id, { name: name, day: q.day, amount: n, category: q.cat });
+  else if (Q.kind === 'billNew') call = server('addBill', { name: name, day: q.day, amount: n, category: q.cat, start: q.start || '' });
+  else if (Q.kind === 'billEdit') call = server('editItem', 'bill', Q.id, { name: name, day: q.day, amount: n, category: q.cat, start: q.start || '' });
   else if (Q.kind === 'billPay') call = server('payBill', { id: Q.id, period: Q.period, amount: n, date: q.date });
   else if (Q.kind === 'goalEdit') call = server('editItem', 'goal', Q.id, { name: name, target: n, deadline: q.deadline || '' });
   else if (Q.kind === 'debtEdit') call = server('editItem', 'debt', Q.id, { name: name, kind: q.kind, total: n });
@@ -1148,6 +1152,7 @@ var CH = {
   formDate: function (el) { S.form.date = el.value; renderSheet(false); },
   qKind: function (el) { S.q.kind = el.value; },
   qDay: function (el) { S.q.day = el.value; },
+  qStart: function (el) { S.q.start = el.value; },
   qCat: function (el) { S.q.cat = el.value; },
   qDeadline: function (el) { S.q.deadline = el.value; },
   qDate: function (el) { S.q.date = el.value; },

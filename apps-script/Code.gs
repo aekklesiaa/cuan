@@ -44,7 +44,7 @@ const HEADERS = {
   'Hutang Riwayat': ['ID', 'Hutang ID', 'Tanggal', 'Jenis', 'Nominal', 'Catatan', 'Dicatat Pada'],
   'Investasi': ['ID', 'Nama', 'Platform', 'Jenis', 'Modal', 'Nilai Terkini', 'Untung/Rugi', 'Update Terakhir'],
   'Investasi Riwayat': ['ID', 'Investasi ID', 'Tanggal', 'Jenis', 'Nominal', 'Catatan', 'Dicatat Pada'],
-  'Tagihan Rutin': ['ID', 'Nama', 'Tanggal Jatuh Tempo', 'Nominal', 'Kategori', 'Dibuat'],
+  'Tagihan Rutin': ['ID', 'Nama', 'Tanggal Jatuh Tempo', 'Nominal', 'Kategori', 'Dibuat', 'Mulai'],
   'Tagihan Dibayar': ['ID', 'Tagihan ID', 'Periode', 'Transaksi ID', 'Tanggal', 'Nominal', 'Dicatat Pada']
 };
 
@@ -304,7 +304,7 @@ function editItem_(kind, id, o) {
       refreshDebts_(ss);
     } else if (kind === 'bill') {
       const b = cleanBill_(o);
-      set('Nama', b.name); set('Tanggal Jatuh Tempo', b.day); set('Nominal', b.amount, MONEY_FORMAT); set('Kategori', b.category);
+      set('Nama', b.name); set('Tanggal Jatuh Tempo', b.day); set('Nominal', b.amount, MONEY_FORMAT); set('Kategori', b.category); set('Mulai', b.start ? "'" + b.start : '');
     } else {
       set('Nama', name);
       set('Platform', o.platform || '');
@@ -320,7 +320,8 @@ function cleanBill_(o) {
   if (!(day >= 1 && day <= 31)) throw new Error('Tanggal jatuh tempo harus 1 sampai 31.');
   if (!(amount > 0)) throw new Error('Nominal harus lebih dari 0.');
   if (!category) throw new Error('Kategori belum dipilih.');
-  return { name: name, day: day, amount: amount, category: category };
+  const start = /^\d{4}-\d{2}$/.test(o.start || '') ? o.start : '';
+  return { name: name, day: day, amount: amount, category: category, start: start };
 }
 
 /** o = {name, day, amount, category} */
@@ -328,7 +329,7 @@ function addBill_(o) {
   const b = cleanBill_(o);
   return withLock_(function (ss) {
     ensureSheet_(ss, SHEET.BILL); ensureSheet_(ss, SHEET.BILL_LOG);
-    appendByHeader_(table_(ss, SHEET.BILL), { 'ID': newId_('TGH'), 'Nama': b.name, 'Tanggal Jatuh Tempo': b.day, 'Nominal': b.amount, 'Kategori': b.category, 'Dibuat': new Date() });
+    appendByHeader_(table_(ss, SHEET.BILL), { 'ID': newId_('TGH'), 'Nama': b.name, 'Tanggal Jatuh Tempo': b.day, 'Nominal': b.amount, 'Kategori': b.category, 'Dibuat': new Date(), 'Mulai': b.start ? "'" + b.start : '' });
   });
 }
 
@@ -374,7 +375,7 @@ function periodOf_(v) {
 function readBills_(ss, tz, outTx) {
   if (!ss.getSheetByName(SHEET.BILL)) return [];
   const t = table_(ss, SHEET.BILL);
-  const cId = col_(t, 'ID', true), cName = col_(t, 'Nama', true), cDay = col_(t, 'Tanggal Jatuh Tempo', true), cAmt = col_(t, 'Nominal', true), cCat = col_(t, 'Kategori', false);
+  const cId = col_(t, 'ID', true), cName = col_(t, 'Nama', true), cDay = col_(t, 'Tanggal Jatuh Tempo', true), cAmt = col_(t, 'Nominal', true), cCat = col_(t, 'Kategori', false), cStart = col_(t, 'Mulai', false);
   const txIds = {}; (outTx || []).forEach(function (x) { txIds[x.id] = x; });
   const paid = {};
   if (ss.getSheetByName(SHEET.BILL_LOG)) {
@@ -389,7 +390,7 @@ function readBills_(ss, tz, outTx) {
   }
   return t.rows.filter(function (r) { return String(r[cId]).trim(); }).map(function (r) {
     const id = String(r[cId]).trim();
-    return { id: id, name: String(r[cName]), day: Math.round(toNum_(r[cDay])) || 1, amount: toNum_(r[cAmt]) || 0, category: cCat !== undefined ? String(r[cCat] || 'Tagihan') : 'Tagihan', paid: paid[id] || {} };
+    return { id: id, name: String(r[cName]), day: Math.round(toNum_(r[cDay])) || 1, amount: toNum_(r[cAmt]) || 0, category: cCat !== undefined ? String(r[cCat] || 'Tagihan') : 'Tagihan', start: cStart !== undefined ? periodOf_(r[cStart]) : '', paid: paid[id] || {} };
   });
 }
 
